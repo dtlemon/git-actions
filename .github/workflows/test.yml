@@ -1,0 +1,16 @@
+	name: Test
+
+	on: push:
+			branches:
+			- main
+		pull_request:
+			branches:
+				- main
+	jobs:
+		Test:
+			runs-on: ubuntu-latest
+			steps:
+				- uses: actions/checkout@v3
+				- run: pip install Flask
+				- run: pip install pytest
+				- run: pytest
