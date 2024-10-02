@@ -1,5 +1,7 @@
 from flask import Flask, request
 from datetime import datetime
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -12,6 +14,13 @@ def hello():
     page += """
     <form action=/>
         <h1>Links:</h1>
+        <br>
+        <table>
+            <tr>
+                <td><a href="/calc">Calculator</a></td>
+                <td><a href="/weather">Weather</a></td>
+            </tr>  
+        </table>
     </form>
 
     
@@ -20,11 +29,14 @@ def hello():
 
 @app.route('/calc')
 def calc():
-    # a = int(request.args["a"])
-    # b = int(request.args["b"])
-# 
-    # return f"{a + b}"
     page = """
+    <table>
+        <tr>
+            <td><a href="/">Back to Home</a></td>
+            <td><a href="/weather">Weather</a></td>
+        </tr>  
+    </table>
+    <br>
     <form action=/calc method=get>
         <input name=a />
         <select name="op" id="operator">
@@ -56,5 +68,31 @@ def calc():
 
     except:
         pass
+    return page
+        
+@app.route('/weather')
+def weather():
+    latitude = 40.107166238 
+    longitude = -85.659664028
+    page = """
+        <table>
+            <tr>
+                <td><a href="/">Back to Home</a></td>
+                <td><a href="/calc">Calculator</a></td>
+            </tr>  
+        </table>
+        <br><br>
+        <h1>The Weather at Anderson University today is:</h1>
+        <br><br>
+    """
+    res = requests.get(f"https://api.weather.gov/points/{latitude},{longitude}")
+    points = json.loads(res.text)
+    forecast_url = points["properties"]["forecast"]
+
+    res = requests.get(forecast_url)
+    forecast = json.loads(res.text)
+    current = forecast["properties"]["periods"][0]
+
+    page += f"<h3>{current['detailedForecast']}</h3>"
 
     return page
